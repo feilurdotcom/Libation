@@ -3,8 +3,6 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 
 # Set the target platform and runtime identifier based on TARGETPLATFORM
 ARG TARGETPLATFORM
-
-# Map TARGETPLATFORM to corresponding RID
 RUN set -eux; \
     if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
         export RID="linux-x64"; \
@@ -19,7 +17,11 @@ RUN set -eux; \
 COPY Source /Source
 
 # Publish the application for the target runtime identifier (RID)
-RUN dotnet publish -c Release -o /Source/bin/Publish/Linux-chardonnay /Source/LibationCli/LibationCli.csproj -r ${RID} --self-contained
+RUN if [ "${RID}" ]; then \
+        dotnet publish -c Release -o /Source/bin/Publish/Linux-chardonnay /Source/LibationCli/LibationCli.csproj -r ${RID} --self-contained; \
+    else \
+        dotnet publish -c Release -o /Source/bin/Publish/Linux-chardonnay /Source/LibationCli/LibationCli.csproj --self-contained; \
+    fi
 
 # Copy the script into the published output directory
 COPY Docker/liberate.sh /Source/bin/Publish/Linux-chardonnay
