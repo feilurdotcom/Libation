@@ -17,7 +17,7 @@ RUN set -eux; \
 COPY Source /Source
 
 # Print the RID to verify it
-RUN echo "Using RID: ${RID}"
+RUN echo "Using TARGETPLATFORM: ${TARGETPLATFORM}"
 
 # Publish the application for the target runtime identifier (RID)
 RUN if [ "${RID}" ]; then \
