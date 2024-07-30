@@ -16,6 +16,9 @@ RUN set -eux; \
 # Copy the source code into the container
 COPY Source /Source
 
+# Print the RID to verify it
+RUN echo "Using RID: ${RID}"
+
 # Publish the application for the target runtime identifier (RID)
 RUN if [ "${RID}" ]; then \
         dotnet publish -c Release -o /Source/bin/Publish/Linux-chardonnay /Source/LibationCli/LibationCli.csproj -r ${RID} --self-contained; \
