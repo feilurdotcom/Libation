@@ -5,30 +5,17 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 ARG TARGETPLATFORM
 RUN set -eux; \
     if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
-        export RID="linux-x64"; \
+        RID="linux-x64"; \
     elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
-        export RID="linux-arm64"; \
+        RID="linux-arm64"; \
     else \
         echo "Unsupported platform: ${TARGETPLATFORM}" && exit 1; \
-    fi && \
-    echo "Building for RID: ${RID}"
+    fi; \
+    echo "Building for RID: ${RID}"; \
+    dotnet publish -c Release -r ${RID} --self-contained -o /Source/bin/Publish/Linux-chardonnay /Source/LibationCli/LibationCli.csproj
 
 # Copy the source code into the container
 COPY Source /Source
-
-# Print the RID to verify it
-RUN echo "Using TARGETPLATFORM: ${TARGETPLATFORM}"
-RUN echo "Building for RID: ${RID}"
-
-# Publish the application for the target runtime identifier (RID)
-RUN if [ "${RID}" ]; then \
-        dotnet publish -c Release -o /Source/bin/Publish/Linux-chardonnay /Source/LibationCli/LibationCli.csproj -r ${RID} --self-contained; \
-    else \
-        dotnet publish -c Release -o /Source/bin/Publish/Linux-chardonnay /Source/LibationCli/LibationCli.csproj --self-contained; \
-    fi
-
-# Copy the script into the published output directory
-COPY Docker/liberate.sh /Source/bin/Publish/Linux-chardonnay
 
 # Use the .NET Runtime image for running the application
 FROM mcr.microsoft.com/dotnet/runtime:8.0
@@ -43,6 +30,9 @@ RUN mkdir /db /config /data
 
 # Copy the published output from the build stage
 COPY --from=build-env /Source/bin/Publish/Linux-chardonnay /libation
+
+# Ensure the binary is executable
+RUN chmod +x /libation/LibationCli
 
 # Set the command to run the application
 CMD ["./libation/liberate.sh"]
