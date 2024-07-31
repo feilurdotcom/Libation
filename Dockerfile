@@ -1,23 +1,23 @@
 # Use the .NET SDK image for building the application
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 
+# Copy the source code into the container
+COPY Source /Source
+
 # Set the target platform and runtime identifier based on TARGETPLATFORM
 ARG TARGETPLATFORM
 RUN set -eux; \
     if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
         RID="linux-x64"; \
-        echo "Check amd64: ${TARGETPLATFORM}" \
+        echo "Check amd64: ${TARGETPLATFORM}"; \
     elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
         RID="linux-arm64"; \
-        echo "Check arm64: ${TARGETPLATFORM}" \
+        echo "Check arm64: ${TARGETPLATFORM}"; \
     else \
         echo "Unsupported platform: ${TARGETPLATFORM}" && exit 1; \
     fi; \
     echo "Building for RID: ${RID}"; \
     dotnet publish -c Release -r ${RID} --self-contained -o /Source/bin/Publish/Linux-chardonnay /Source/LibationCli/LibationCli.csproj
-
-# Copy the source code into the container
-COPY Source /Source
 
 # Use the .NET Runtime image for running the application
 FROM mcr.microsoft.com/dotnet/runtime:8.0
