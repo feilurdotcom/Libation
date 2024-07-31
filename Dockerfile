@@ -12,15 +12,13 @@ RUN echo "Target Platform: $TARGETPLATFORM"
 
 # Determine the runtime identifier (RID)
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
-        export RID="linux-x64"; \
+        dotnet publish -r linux-x64 -c Release -o /Source/bin/Publish/Linux-chardonnay /Source/LibationCli/LibationCli.csproj -p:PublishProfile=/Source/LibationCli/Properties/PublishProfiles/LinuxProfile.pubxml; \
     elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
-        export RID="linux-arm64"; \
+        dotnet publish -r linux-arm64 -c Release -o /Source/bin/Publish/Linux-chardonnay /Source/LibationCli/LibationCli.csproj -p:PublishProfile=/Source/LibationCli/Properties/PublishProfiles/LinuxProfile.pubxml; \
     else \
         echo "Unsupported TARGETPLATFORM: $TARGETPLATFORM"; \
         exit 1; \
-    fi && \
-    echo "Using RID: $RID" && \
-    dotnet publish -r $RID -c Release -o /Source/bin/Publish/Linux-chardonnay /Source/LibationCli/LibationCli.csproj -p:PublishProfile=/Source/LibationCli/Properties/PublishProfiles/LinuxProfile.pubxml
+    fi
 
 # Copy the liberation script to the output directory
 COPY Docker/liberate.sh /Source/bin/Publish/Linux-chardonnay
