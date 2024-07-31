@@ -8,13 +8,19 @@ COPY Source /Source
 ARG TARGETPLATFORM
 
 # Echo the target platform to verify it's passed correctly
-# Use a simpler syntax to avoid potential issues
 RUN echo "Target Platform: $TARGETPLATFORM"
 
-# Publish the .NET project for the specified runtime
-# Note: The TARGETPLATFORM should be converted to a valid RID (e.g., linux-x64)
-# For demonstration purposes, assuming a conversion is needed
-RUN RID=${TARGETPLATFORM//\//-} && dotnet publish -r $RID -c Release -o /Source/bin/Publish/Linux-chardonnay /Source/LibationCli/LibationCli.csproj -p:PublishProfile=/Source/LibationCli/Properties/PublishProfiles/LinuxProfile.pubxml
+# Determine the runtime identifier (RID)
+RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
+        export RID="linux-x64"; \
+    elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then \
+        export RID="linux-arm64"; \
+    else \
+        echo "Unsupported TARGETPLATFORM: $TARGETPLATFORM"; \
+        exit 1; \
+    fi && \
+    echo "Using RID: $RID" && \
+    dotnet publish -r $RID -c Release -o /Source/bin/Publish/Linux-chardonnay /Source/LibationCli/LibationCli.csproj -p:PublishProfile=/Source/LibationCli/Properties/PublishProfiles/LinuxProfile.pubxml
 
 # Copy the liberation script to the output directory
 COPY Docker/liberate.sh /Source/bin/Publish/Linux-chardonnay
