@@ -6,8 +6,10 @@ ARG TARGETPLATFORM
 RUN set -eux; \
     if [ "${TARGETPLATFORM}" = "linux/amd64" ]; then \
         RID="linux-x64"; \
+        echo "Check amd64: ${TARGETPLATFORM}" \
     elif [ "${TARGETPLATFORM}" = "linux/arm64" ]; then \
         RID="linux-arm64"; \
+        echo "Check arm64: ${TARGETPLATFORM}" \
     else \
         echo "Unsupported platform: ${TARGETPLATFORM}" && exit 1; \
     fi; \
