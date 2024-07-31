@@ -18,6 +18,7 @@ COPY Source /Source
 
 # Print the RID to verify it
 RUN echo "Using TARGETPLATFORM: ${TARGETPLATFORM}"
+RUN echo "Building for RID: ${RID}"
 
 # Publish the application for the target runtime identifier (RID)
 RUN if [ "${RID}" ]; then \
