@@ -3,6 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 as build-env
 
 COPY Source /Source
 ARG TARGETPLATFORM
+RUN echo ${TARGETPLATFORM//\//-}
 RUN dotnet publish -r ${TARGETPLATFORM//\//-} -c Release -o /Source/bin/Publish/Linux-chardonnay /Source/LibationCli/LibationCli.csproj -p:PublishProfile=/Source/LibationCli/Properties/PublishProfiles/LinuxProfile.pubxml
 COPY Docker/liberate.sh /Source/bin/Publish/Linux-chardonnay
 
